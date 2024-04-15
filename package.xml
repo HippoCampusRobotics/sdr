@@ -18,7 +18,7 @@
 
   <depend>rclpy</depend>
   <depend>hippo_common</depend>
-  <depend>hippo_msgs</depend>
+  <depend>sdr_msgs</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
