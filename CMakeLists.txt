@@ -37,7 +37,7 @@ install(PROGRAMS
 )
 
 install(
-  DIRECTORY launch config
+  DIRECTORY launch
   DESTINATION share/${PROJECT_NAME}
 )
 
