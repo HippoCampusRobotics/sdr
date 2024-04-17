@@ -23,7 +23,7 @@ class NooElec(object):
         samples = self.sdr.read_samples(num_samples=self.read_size)
         return samples
 
-    def get_rssi_peak(self, frequency: float):
+    def get_rss_peak(self, frequency: float):
         frequency_span = 1e6
         all_frequencies, pxx_density = self.get_power_density_spectrum()
 
@@ -31,14 +31,26 @@ class NooElec(object):
             np.logical_and(all_frequencies >= (frequency - frequency_span),
                            all_frequencies <= (frequency + frequency_span)))[0]
 
-        max_rssi_index = np.where(pxx_density == max(
+        max_pxx_index = np.where(pxx_density == max(
             pxx_density[indices_within_band[0]:indices_within_band[-1]]))[0]
+        max_pxx_index = max_pxx_index[0]
+
+        # max_pxx = max(pxx_density)
+
+        # self.logger.info(f'pxx_density: {pxx_density}')
+
+        # max_pxx_index = np.where(pxx_density == max_pxx)
+        # max_pxx_index = max_pxx_index[0]  # array to list
+        # max_pxx_index = max_pxx_index[0]  # first list element
+
+        # self.logger.info(f'max pxx: {max_pxx}')
+        # self.logger.info(f'Max pxx index: {max_pxx_index}')
 
         # convert to dBm
-        peak_rssi = 10 * np.log10(pxx_density[max_rssi_index][0])
-        peak_frequency = all_frequencies[max_rssi_index][0]
+        peak_rss = 10 * np.log10(pxx_density[max_pxx_index])
+        peak_frequency = all_frequencies[max_pxx_index]
 
-        return peak_frequency, peak_rssi
+        return peak_frequency, peak_rss
 
     def get_power_density_spectrum(self):
         # - get iq samples and calculate power density
@@ -49,15 +61,19 @@ class NooElec(object):
 
         samples = self.read_iq_samples()
 
-        # FFT
+        # FFT, pxx density in V**2/Hz
         frequencies, pxx_density = scipy.signal.periodogram(
-            samples,
-            fs=self.sdr.sample_rate,
-            nfft=1024,
+            samples,  # time series of measurement values
+            fs=self.sdr.sample_rate,  # sampling frequency
+            nfft=1024,  # length of the fft
+            return_onesided=False,  # two sided spectrum (we have complex data)
         )
-
-        frequencies = np.sort(frequencies)
-        pxx_density = np.sort(pxx_density)
+        # we need to sort data so that frequencies increase
+        # what indices would do this?
+        sorted_indices = frequencies.argsort()
+        # sort both arrays
+        frequencies = frequencies[sorted_indices]
+        pxx_density = pxx_density[sorted_indices]
 
         frequencies = frequencies + self.sdr.center_freq
 
