@@ -13,7 +13,7 @@ def live_plot_power_spectrum_density(dvb_t_dongle: NooElec):
 
     # init data
     frequencies, pxx_densities = dvb_t_dongle.get_power_density_spectrum()
-    # want frequencies in MHz
+    # we want frequencies in MHz
     frequencies = frequencies / 1e6
     line, = ax.plot(frequencies, pxx_densities, 'b-')
 
@@ -31,14 +31,15 @@ def live_plot_power_spectrum_density(dvb_t_dongle: NooElec):
             )
             line.set_ydata(10 * np.log10(pxx_densities))
 
-            # label peak at known transmitter frequency
+            # label the highest peak
             peak_frequency, peak_rss = dvb_t_dongle.get_rss_peak(
-                frequency=dvb_t_dongle.sdr.center_freq, frequency_span=1e7)
-            plt.legend([
-                f'Highest RRS = {peak_rss:.2f} dBm at {peak_frequency / 1e6} MHz'
-            ],
-                       loc='upper right')
-
+                search_all=True)
+            plt.legend(
+                [
+                    f'Highest RRS = {peak_rss:.2f} dBm at {peak_frequency / 1e6} MHz'
+                ],
+                loc='upper right',
+            )
             fig.canvas.draw()
             plt.pause(0.01)
 
