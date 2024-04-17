@@ -8,21 +8,19 @@ from sdr.dvb_t import NooElec
 
 
 def live_plot_power_spectrum_density(dvb_t_dongle: NooElec):
-    plt.ion()  # turn interactive mode on
     fig = plt.figure()
     ax = fig.add_subplot(111)
 
     # init data
     frequencies, pxx_densities = dvb_t_dongle.get_power_density_spectrum()
+    # want frequencies in MHz
+    frequencies = frequencies / 1e6
     line, = ax.plot(frequencies, pxx_densities, 'b-')
 
-    plt.axis([
-        dvb_t_dongle.sdr.center_freq - 1.1e6,
-        dvb_t_dongle.sdr.center_freq + 1.1e6, -140, 0
-    ])
+    plt.ylim(-140, 0)
     plt.grid()
-    plt.xlabel('Frequency [Hz]')
-    plt.ylabel('Power [dB? dBm?]')
+    plt.xlabel('Frequency [MHz]')
+    plt.ylabel('Power [dBm]')
 
     drawing = True
     line.set_xdata(frequencies)
@@ -32,6 +30,14 @@ def live_plot_power_spectrum_density(dvb_t_dongle: NooElec):
             frequencies, pxx_densities = dvb_t_dongle.get_power_density_spectrum(
             )
             line.set_ydata(10 * np.log10(pxx_densities))
+
+            # label peak at known transmitter frequency
+            peak_frequency, peak_rss = dvb_t_dongle.get_rss_peak(
+                frequency=dvb_t_dongle.sdr.center_freq, frequency_span=1e7)
+            plt.legend([
+                f'Highest RRS = {peak_rss:.2f} dBm at {peak_frequency / 1e6} MHz'
+            ],
+                       loc='upper right')
 
             fig.canvas.draw()
             plt.pause(0.01)
@@ -69,7 +75,7 @@ def live_plot_tx_rss(dvb_t_dongle: NooElec, frequency: float):
             )
             plt.legend(loc='upper right')
             plt.ylim(-140, 0)
-            plt.ylabel('RSS [dB? dBm?]')
+            plt.ylabel('RSS [dBm]')
             plt.grid()
             plt.pause(0.01)
 
@@ -80,11 +86,11 @@ def live_plot_tx_rss(dvb_t_dongle: NooElec, frequency: float):
 
 def main(plot_type):
     dvb_t_dongle = NooElec()
+    frequency = 434.17e6
     if plot_type == 'pds':
         print(f'Live plotting of power density spectrum')
         live_plot_power_spectrum_density(dvb_t_dongle)
     elif plot_type == 'tx_rss':
-        frequency = 434.17e6
         print(f'Live plotting of transceiver rss for frequency {frequency}')
         live_plot_tx_rss(dvb_t_dongle, frequency)
 
