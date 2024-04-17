@@ -35,17 +35,6 @@ class NooElec(object):
             pxx_density[indices_within_band[0]:indices_within_band[-1]]))[0]
         max_pxx_index = max_pxx_index[0]
 
-        # max_pxx = max(pxx_density)
-
-        # self.logger.info(f'pxx_density: {pxx_density}')
-
-        # max_pxx_index = np.where(pxx_density == max_pxx)
-        # max_pxx_index = max_pxx_index[0]  # array to list
-        # max_pxx_index = max_pxx_index[0]  # first list element
-
-        # self.logger.info(f'max pxx: {max_pxx}')
-        # self.logger.info(f'Max pxx index: {max_pxx_index}')
-
         # convert to dBm
         peak_rss = 10 * np.log10(pxx_density[max_pxx_index])
         peak_frequency = all_frequencies[max_pxx_index]
