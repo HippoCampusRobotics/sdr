@@ -23,7 +23,7 @@ class SdrNode(Node):
 
     def read_samples(self):
 
-        exp_peak_freq = 434.17e6  # around which frequency we search for peak
+        exp_peak_freq = 434.168e6  # around which frequency we search for peak
 
         frequency, pxx_density = self.dvb_t_dongle.get_rss_peak(exp_peak_freq)
         msg = Rss()

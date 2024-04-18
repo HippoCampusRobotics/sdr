@@ -23,17 +23,25 @@ class NooElec(object):
         samples = self.sdr.read_samples(num_samples=self.read_size)
         return samples
 
-    def get_rss_peak(self, frequency: float):
-        frequency_span = 1e6
+    def get_rss_peak(self,
+                     frequency=434e6,
+                     frequency_span=1e6,
+                     search_all=False):
+
         all_frequencies, pxx_density = self.get_power_density_spectrum()
 
-        indices_within_band = np.where(
-            np.logical_and(all_frequencies >= (frequency - frequency_span),
-                           all_frequencies <= (frequency + frequency_span)))[0]
+        if search_all:
+            max_pxx_index = np.where(pxx_density == max(pxx_density))[0]
+            max_pxx_index = max_pxx_index[0]
+        else:
+            indices_within_band = np.where(
+                np.logical_and(all_frequencies >= (frequency - frequency_span),
+                               all_frequencies <=
+                               (frequency + frequency_span)))[0]
 
-        max_pxx_index = np.where(pxx_density == max(
-            pxx_density[indices_within_band[0]:indices_within_band[-1]]))[0]
-        max_pxx_index = max_pxx_index[0]
+            max_pxx_index = np.where(pxx_density == max(
+                pxx_density[indices_within_band[0]:indices_within_band[-1]]))[0]
+            max_pxx_index = max_pxx_index[0]
 
         # convert to dBm
         peak_rss = 10 * np.log10(pxx_density[max_pxx_index])
