@@ -15,7 +15,6 @@ add_compile_options(${CXX_FLAGS})
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_python REQUIRED)
 find_package(rclpy REQUIRED)
-find_package(hippo_msgs REQUIRED)
 # find_package(std_msgs REQUIRED)
 # find_package(rosidl_default_generators REQUIRED)
 # find_package(builtin_interfaces REQUIRED)
@@ -33,6 +32,7 @@ ament_python_install_package(${PROJECT_NAME})
 # Install Python executables
 install(PROGRAMS
   nodes/sdr_node.py
+  nodes/measurement_helper_node.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
