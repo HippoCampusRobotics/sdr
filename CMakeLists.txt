@@ -32,7 +32,6 @@ ament_python_install_package(${PROJECT_NAME})
 # Install Python executables
 install(PROGRAMS
   nodes/sdr_node.py
-  nodes/measurement_helper_node.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
